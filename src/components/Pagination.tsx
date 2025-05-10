@@ -1,8 +1,14 @@
-function Pagination({ currentPage, totalPages, onPageChange }:{currentPage:number, totalPages:number, onPageChange:(val:number) => void}) {
+interface PaginationProps {
+    currentPage: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+}
+
+function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
 
 
-    
-    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    const pages: number[] = Array.from({ length: totalPages }, (_, i) => i + 1);
     return (
         <div className="flex justify-center space-x-2 mt-6">
             <button
