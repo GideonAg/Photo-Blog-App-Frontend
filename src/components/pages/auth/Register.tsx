@@ -100,7 +100,6 @@ export default function Register() {
 				password,
 			}, { headers: {
 					'Content-Type': 'application/json',
-					'Origin': 'https://mscv2group1.link'
 				}});
 
 			// On success, clear form and show success message
