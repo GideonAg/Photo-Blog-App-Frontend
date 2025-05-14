@@ -98,9 +98,7 @@ export default function Register() {
 				lastName,
 				email,
 				password,
-			}, { headers: {
-					'Content-Type': 'application/json',
-				}});
+			});
 
 			// On success, clear form and show success message
 			setFormData({

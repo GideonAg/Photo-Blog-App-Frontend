@@ -34,8 +34,8 @@ export default function Login() {
             [name]: value,
         }));
         setErrors((prev) => ({
-        ...prev,
-        [name]: undefined,
+            ...prev,
+            [name]: undefined,
         }));
         setServerError(null);
     };
@@ -65,15 +65,15 @@ export default function Login() {
             const { email, password } = result.data;
 
             // Axios config with headers
-            const config = {
-                headers: {
-                "Content-Type": "application/json",
-                "Origin": "http://localhost:5173",
-                },
-            };
+            // const config = {
+            //     headers: {
+            //     "Content-Type": "application/json",
+            //     "Origin": "http://localhost:5173",
+            //     },
+            // };
 
             const api_link = import.meta.env.VITE_API_URL;
-            const response = await axios.post(api_link, { email, password, },config );
+            const response = await axios.post(api_link, { email, password, });
 
             if(response.data.status === "success") {
                 // store the id token
