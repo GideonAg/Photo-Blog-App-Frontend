@@ -3,6 +3,7 @@ import Dashboard from "./components/pages/Dashboard";
 import Login from "./components/pages/auth/Login";
 import Register from "./components/pages/auth/Register";
 import RecycleBin from "./components/pages/RecycleBin";
+import UploadImage from "./components/pages/UploadImage";
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
 				<Route path="/register" element={<Register />}></Route>
 				<Route path="/" element={<Dashboard />}></Route>
 				<Route path="/recycle-bin" element={<RecycleBin />}></Route>
+				<Route path="/upload" element={<UploadImage />}></Route>
 			</Routes>
 		</BrowserRouter>
 	);

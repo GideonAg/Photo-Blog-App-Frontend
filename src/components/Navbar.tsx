@@ -9,6 +9,7 @@ function Navbar() {
                 <Link to="/" className="text-2xl font-bold tracking-tight">ImageHub</Link>
                 <div className="space-x-4">
                     <Link to="/" className="hover:text-blue-200 transition-colors">Dashboard</Link>
+                    <Link to="/upload" className="hover:text-blue-200 transition-colors">Upload Image</Link>
                     <Link to="/recycle-bin" className="hover:text-blue-200 transition-colors">Recycle Bin</Link>
                     <button
                         onClick={() => {
