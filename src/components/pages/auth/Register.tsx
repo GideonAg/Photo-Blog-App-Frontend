@@ -91,9 +91,9 @@ export default function Register() {
 
 		// If validation passes, send data to your API
 		try {
-			const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"; // Fallback for development
+			const API_URL = import.meta.env.VITE_API_URL; // Fallback for development
 			const { firstName, lastName, email, password } = result.data;
-			await axios.post(`${API_URL}/register`, {
+			await axios.post(`${API_URL}/auth/signup`, {
 				firstName,
 				lastName,
 				email,
