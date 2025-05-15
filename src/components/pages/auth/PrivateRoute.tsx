@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 interface PrivateRouteProps {
 	children: ReactNode;
@@ -14,7 +15,15 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
 		try {
 			const token = sessionStorage.getItem("idToken");
 			if (token) {
-				setIsAuthenticated(true);
+				const decoded = jwtDecode(token);
+				const currentTime = Date.now() / 1000;
+				if(decoded.exp && decoded.exp > currentTime) {
+					setIsAuthenticated(true);
+				}
+				else {
+					setIsAuthenticated(false);
+					sessionStorage.removeItem("idToken");
+				}
 			} else {
 				setIsAuthenticated(false);
 			}

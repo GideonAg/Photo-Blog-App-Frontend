@@ -13,6 +13,7 @@ function UploadImage() {
     const [isDragging, setIsDragging] = React.useState<boolean>(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const [message, setMessage] = useState<string>("");
+    const [loading, setLoading] = useState(false);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const file = event.target.files?.[0];
@@ -54,6 +55,7 @@ function UploadImage() {
 
     const handleUpload = async (): Promise<any> => {
         if (selectedFile && preview) {
+            setLoading(true)
             try {
                 const base64String = preview.split(',')[1];
                 const contentType = selectedFile.type;
@@ -71,11 +73,14 @@ function UploadImage() {
                     if (fileInputRef.current) {
                         fileInputRef.current.value = '';
                     }
+                    setLoading(false);
                     navigate('/');
                 }
+                setLoading(false);
                 setMessage("There was an error while uploading the image. Try again");
                 
             } catch (error) {
+                setLoading(false);
                 setMessage("There was an error while uploading the image. Try again")
             }
         }
@@ -129,7 +134,7 @@ function UploadImage() {
                             onClick={handleUpload}
                             className="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition-colors"
                         >
-                            Upload Image
+                            {loading ? 'Uploading...' : 'Upload Image'}
                         </button>
                     </div>
                 )}
