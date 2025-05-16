@@ -3,7 +3,7 @@ import Layout from "../../layout/Layout"
 import ImageCard from "../ImageCard";
 import Pagination from "../Pagination";
 import Modal from "../Modal";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 interface Image {
 	id: number;
@@ -17,16 +17,18 @@ function Dashboard() {
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [selectedImage, setSelectedImage] = useState<Image | null>(null);
 	const [message, setMessage] = useState<String>("");
+	const [errorMessage, setErrorMessage] = useState<String>("");
 	const [isloading, setIsLoading] = useState(false);
 	const imagesPerPage: number = 8;
 	const totalPages: number = Math.ceil(images.length / imagesPerPage);
+	const api_link = import.meta.env.VITE_API_URL;
 
 
 	useEffect(() => {
 		setIsLoading(true)
 		const fetchImages = async () => {
 			try {
-				const api_link = import.meta.env.VITE_API_URL;
+				
 				const response = await axios.get(`${api_link}/photos`, {headers: { Authorization: `Bearer ${sessionStorage.getItem('idToken')}`}});
 				if(response && response.status) {
 					if(response.data.message === "No active photos found") {
@@ -34,16 +36,22 @@ function Dashboard() {
 						setMessage(response.data.message);
 						setIsLoading(false);
 					}
+					else{
+						console.log(response)
+						const fetchedImages: Image[] = response.data.map((url: string, index: number) => ({
+							id: index,
+							src: url,
+							alt: `Image ${index + 1}`,
+						}));
+						setImages(fetchedImages);
+						setIsLoading(false);
+					}
 				}
 			} catch (error) {
+				if(error instanceof AxiosError)
 				console.log(error)
 			}
-			// const mockImages: Image[] = Array.from({ length: 50 }, (_, i) => ({
-			// 	id: i,
-			// 	src: `https://picsum.photos/300/200?random=${i}`,
-			// 	alt: `Image ${i + 1}`,
-			// }));
-			// setImages(mockImages);
+			
 		};
 		fetchImages();
 	}, []);
@@ -56,8 +64,23 @@ function Dashboard() {
 		}
 	};
 
-	const handleShare = (image: Image): void => {
-		alert(`Sharing ${image.alt}`);
+	const handleShare = async (image: Image) => {
+		try {
+			const response = await axios.post(`${api_link}/photos/${image.id}/share`, {}, {headers: {Authorization: `Bearer ${sessionStorage.getItem('idToken')}`}});
+			if(response.status === 200) {
+				alert("Your share link is:" + response.data.value);
+				setErrorMessage(response.data.message);
+			}
+			else {
+				console.log(response)
+				setErrorMessage(response.data.message);
+			}
+		} catch (error) {
+			if(error instanceof AxiosError) {
+				console.log(error, "CATCH BLOCK")
+				setErrorMessage(error.response?.data.message);
+			}
+		}
 	};
 
 	const handlePageChange = (page: number): void => {
@@ -90,6 +113,13 @@ function Dashboard() {
 				</>
 			):(
 				<>
+					{errorMessage ? (
+						<>
+							<div className="w-full col-span-1 sm:col-span-2 lg:col-span-4 flex items-center justify-center">
+								<p className="text-center font-semibold text-lg">{errorMessage}</p>
+							</div>
+						</>
+					):""}
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 						{paginatedImages && paginatedImages.length > 0 ? (
 							paginatedImages.map((image) => (

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Layout from '../../layout/Layout';
 import { FaUpload } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 
 
@@ -62,7 +62,7 @@ function UploadImage() {
                 const api_link = import.meta.env.VITE_API_URL;
                 const payload = {
                     image: base64String,
-                    "contentType": contentType
+                    "contentType": contentType,
                 };
                 console.log(payload)
                 const response = await axios.post(`${api_link}/photos`, payload, {headers: {Authorization: `Bearer ${sessionStorage.getItem('idToken')}`}} );
@@ -77,11 +77,15 @@ function UploadImage() {
                     navigate('/');
                 }
                 setLoading(false);
-                setMessage("There was an error while uploading the image. Try again");
+                setMessage("There was an error while uploading the image. Try again NOT 200");
                 
             } catch (error) {
+                if(error instanceof AxiosError) {
+                    const message = error.response?.data.message || error.message;
+                    setMessage(message);
+                    setLoading(false);
+                }
                 setLoading(false);
-                setMessage("There was an error while uploading the image. Try again")
             }
         }
     };
