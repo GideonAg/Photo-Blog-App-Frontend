@@ -4,6 +4,7 @@ import Input from "../../Input";
 import AuthLayout from "./AuthLayout";
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address").min(1, "Email is required"),
@@ -16,6 +17,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
+    const navigation = useNavigate();
 
     // Form state
     const [formData, setFormData] = useState<LoginForm>({
@@ -73,20 +75,22 @@ export default function Login() {
             // };
 
             const api_link = import.meta.env.VITE_API_URL;
-            const response = await axios.post(api_link, { email, password, });
+            const response = await axios.post(`${api_link}/auth/login`, { email, password, });
+            console.log(response);
 
-            if(response.data.status === "success") {
-                // store the id token
+            if(response.data.success) {
                 sessionStorage.setItem("idToken", response.data.idToken)
             }
             else {
-                
+                setServerError("Login failed. Please check your credentials.");
             }
             
             setFormData({
                 email: "",
                 password: "",
             });
+            navigation('/', { replace: true });
+
         } 
         catch (error: any) {
             const errorMessage =

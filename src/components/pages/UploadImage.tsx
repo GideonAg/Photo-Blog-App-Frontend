@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Layout from '../../layout/Layout';
 import { FaUpload } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import axios, { AxiosError } from 'axios';
 
 
 
@@ -11,6 +12,8 @@ function UploadImage() {
     const [preview, setPreview] = React.useState<string | null>(null);
     const [isDragging, setIsDragging] = React.useState<boolean>(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [message, setMessage] = useState<string>("");
+    const [loading, setLoading] = useState(false);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const file = event.target.files?.[0];
@@ -21,6 +24,9 @@ function UploadImage() {
                 setPreview(reader.result as string);
             };
             reader.readAsDataURL(file);
+        }
+        else {
+            setMessage("You can only upload an image");
         }
     };
 
@@ -47,22 +53,51 @@ function UploadImage() {
         setIsDragging(false);
     };
 
-    const handleUpload = (): void => {
+    const handleUpload = async (): Promise<any> => {
         if (selectedFile && preview) {
-            // In a real app, upload to server here and get response
-            alert('Image uploaded successfully!');
-            setSelectedFile(null);
-            setPreview(null);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
+            setLoading(true)
+            try {
+                const base64String = preview.split(',')[1];
+                const contentType = selectedFile.type;
+                const api_link = import.meta.env.VITE_API_URL;
+                const payload = {
+                    image: base64String,
+                    "contentType": contentType,
+                };
+                console.log(payload)
+                const response = await axios.post(`${api_link}/photos`, payload, {headers: {Authorization: `Bearer ${sessionStorage.getItem('idToken')}`}} );
+                if(response.status === 200 && response.data.status === "success") {
+                    console.log(response);
+                    setSelectedFile(null);
+                    setPreview(null);
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                    }
+                    setLoading(false);
+                    navigate('/');
+                }
+                setLoading(false);
+                setMessage("There was an error while uploading the image. Try again NOT 200");
+                
+            } catch (error) {
+                if(error instanceof AxiosError) {
+                    const message = error.response?.data.message || error.message;
+                    setMessage(message);
+                    setLoading(false);
+                }
+                setLoading(false);
             }
-            navigate('/');
         }
     };
 
     return (
         <Layout>
             <h1 className="text-3xl font-bold text-gray-800 mb-6">Upload Photo</h1>
+            {message && (
+                <>
+                    <p className='text-red-600 font-semibold text-md'>{message}</p>
+                </>
+            )}
             <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
                 <div
                     className={`border-2 border-dashed rounded-lg p-8 text-center ${
@@ -103,7 +138,7 @@ function UploadImage() {
                             onClick={handleUpload}
                             className="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 transition-colors"
                         >
-                            Upload Image
+                            {loading ? 'Uploading...' : 'Upload Image'}
                         </button>
                     </div>
                 )}
