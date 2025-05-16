@@ -3,6 +3,7 @@ backend:
   phases:
     preBuild:
         commands:
+          - nvm install 23.5.0
           - nvm use 23.5.0  # Use Node 20
           - npm install -g npm@latest  # Update npm
           - npm ci  # Install dependencies
