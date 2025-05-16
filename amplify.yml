@@ -1,26 +1,27 @@
 version: 1
 backend:
   phases:
-    preBuild:
-        commands:
-          - nvm install 23.5.0
-          - nvm use 23.5.0  # Use Node 20
-          - npm install -g npm@latest  # Update npm
-          - npm ci  # Install dependencies
     build:
       commands:
-        - npm ci --cache .npm --prefer-offline
-        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
+        - '# Execute Amplify CLI with the helper script'
+        - amplifyPush --simple
 frontend:
   phases:
+    preBuild:
+      commands:
+        - nvm install 22
+        - nvm use 22
+        - npm install -g npm@latest
+        - npm install -g aws-cdk@latest  # Install latest CDK CLI
+        - npm ci
     build:
       commands:
         - npm run build
   artifacts:
-    baseDirectory: dist
+    baseDirectory: dist  # Vite’s default output directory
     files:
       - '**/*'
   cache:
     paths:
-      - .npm/**/*
       - node_modules/**/*
+      - .npm/**/*
