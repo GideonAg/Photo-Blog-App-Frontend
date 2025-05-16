@@ -6,7 +6,7 @@ import Pagination from "../Pagination";
 import axios from "axios";
 
 interface Image {
-    id: number;
+    id: string;
     src: string;
     alt: string;
 }
@@ -27,6 +27,7 @@ function RecycleBin() {
 			try {
 				const api_link = import.meta.env.VITE_API_URL;
 				const response = await axios.get(`${api_link}/recycle-bin`, {headers: { Authorization: `Bearer ${sessionStorage.getItem('idToken')}`}});
+                console.log(response)
 				if(response && response.status === 200) {
                     if (Array.isArray(response.data) && response.data.length === 0) {
                         console.log("No deleted images found.");

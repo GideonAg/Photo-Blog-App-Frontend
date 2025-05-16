@@ -2,7 +2,7 @@ import { FaShareAlt, FaTrash, FaUndo } from "react-icons/fa";
 
 
 interface Image {
-    id: number;
+    id: string;
     src: string;
     alt: string;
 }

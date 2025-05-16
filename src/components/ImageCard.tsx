@@ -1,7 +1,7 @@
 import { FaShareAlt, FaTrash, FaUndo } from "react-icons/fa";
 
 interface Image {
-    id: number;
+    id: string;
     src: string;
     alt: string;
 }
@@ -12,10 +12,17 @@ interface ImageCardProps {
     onSecondaryAction: (image: Image) => void;
     onClick: (image: Image) => void;
     isRecycleBin?: boolean;
+    isSharing?: boolean; // New prop for loading state
 }
 
-
-function ImageCard({ image, onDelete, onSecondaryAction, onClick, isRecycleBin = false }: ImageCardProps) {
+function ImageCard({
+    image,
+    onDelete,
+    onSecondaryAction,
+    onClick,
+    isRecycleBin = false,
+    isSharing = false, // Default to false if not provided
+}: ImageCardProps) {
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300">
             <img
@@ -39,8 +46,35 @@ function ImageCard({ image, onDelete, onSecondaryAction, onClick, isRecycleBin =
                             onClick={() => onSecondaryAction(image)}
                             className="text-blue-500 hover:text-blue-700 transition-colors"
                             title="Share"
+                            disabled={isSharing} // Disable Share button when sharing
                         >
-                            <FaShareAlt size={20} />
+                            {isSharing ? (
+                                <svg
+                                    className="animate-spin w-5 h-5 text-blue-500"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    />
+                                    <path
+                                        className="opacity-75"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                        d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0z"
+                                    />
+                                </svg>
+                            ) : (
+                                <FaShareAlt size={20} />
+                            )}
                         </button>
                     )}
                 </div>
@@ -49,4 +83,4 @@ function ImageCard({ image, onDelete, onSecondaryAction, onClick, isRecycleBin =
     );
 }
 
-export default ImageCard
+export default ImageCard;
