@@ -5,4 +5,15 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: {
+      alias: [
+      {
+        find: './runtimeConfig',
+        replacement: './runtimeConfig.browser',
+      },
+    ]
+  },
+  build: {
+    outDir: "dist",
+  }
 })
