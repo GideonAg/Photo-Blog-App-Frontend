@@ -1,3 +1,32 @@
+# version: 1
+# backend:
+#   phases:
+#     build:
+#       commands:
+#         - '# Execute Amplify CLI with the helper script'
+#         - amplifyPush --simple
+# frontend:
+#   phases:
+#     preBuild:
+#       commands:
+#         - nvm install 22
+#         - nvm use 22
+#         - npm install -g npm@latest
+#         - npm install -g aws-cdk@latest  # Install latest CDK CLI
+#         - npm ci
+#     build:
+#       commands:
+#         - npm run build
+#   artifacts:
+#     baseDirectory: dist  # Vite’s default output directory
+#     files:
+#       - '**/*'
+#   cache:
+#     paths:
+#       - node_modules/**/*
+#       - .npm/**/*
+
+
 version: 1
 backend:
   phases:
@@ -9,16 +38,14 @@ frontend:
   phases:
     preBuild:
       commands:
-        - nvm install 22
-        - nvm use 22
-        - npm install -g npm@latest
-        - npm install -g aws-cdk@latest  # Install latest CDK CLI
         - npm ci
     build:
       commands:
         - npm run build
+        
   artifacts:
-    baseDirectory: dist  # Vite’s default output directory
+    # IMPORTANT - Please verify your build output directory
+    baseDirectory: dist
     files:
       - '**/*'
   cache:
