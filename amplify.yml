@@ -1,54 +1,21 @@
-# version: 1
-# backend:
-#   phases:
-#     build:
-#       commands:
-#         - '# Execute Amplify CLI with the helper script'
-#         - amplifyPush --simple
-# frontend:
-#   phases:
-#     preBuild:
-#       commands:
-#         - nvm install 22
-#         - nvm use 22
-#         - npm install -g npm@latest
-#         - npm install -g aws-cdk@latest  # Install latest CDK CLI
-#         - npm ci
-#     build:
-#       commands:
-#         - npm run build
-#   artifacts:
-#     baseDirectory: dist  # Vite’s default output directory
-#     files:
-#       - '**/*'
-#   cache:
-#     paths:
-#       - node_modules/**/*
-#       - .npm/**/*
-
-
 version: 1
-backend:
-  phases:
-    build:
-      commands:
-        - '# Execute Amplify CLI with the helper script'
-        - amplifyPush --simple
 frontend:
   phases:
     preBuild:
       commands:
-        - npm ci
+        - nvm install 20
+        - nvm use 20
+        - npm install -g npm@10.8.2
     build:
       commands:
+        - npm ci --cache .npm --prefer-offline
         - npm run build
-        
+        - echo "Deploying with branch $AWS_BRANCH and app-id $AWS_APP_ID"
+        - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID --verbose
   artifacts:
-    # IMPORTANT - Please verify your build output directory
-    baseDirectory: dist
+    baseDirectory: dist  # Vite outputs to 'dist', not 'build'
     files:
       - '**/*'
   cache:
     paths:
       - node_modules/**/*
-      - .npm/**/*
