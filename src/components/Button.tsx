@@ -26,7 +26,7 @@ const Button = ({
     danger: "bg-red-600 text-white hover:bg-red-700",
   };
 
-  const disabledClasses = disabled ? "disabled:opacity-50 disabled:cursor-not-allowed": "";
+  // const disabledClasses = disabled ? "disabled:opacity-50 disabled:cursor-not-allowed": "";
 
   // Use the variant class or fallback to an empty string if variant is undefined
   const variantClasses = variants[variant] || variants.primary;
