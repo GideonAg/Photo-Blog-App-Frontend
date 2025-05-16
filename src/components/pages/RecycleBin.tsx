@@ -3,7 +3,7 @@ import Layout from "../../layout/Layout";
 import ImageCard from "../ImageCard";
 import Modal from "../Modal";
 import Pagination from "../Pagination";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 interface Image {
     id: string;
@@ -12,14 +12,17 @@ interface Image {
 }
 
 function RecycleBin() {
-    const [images, setImages] = useState<Image[]>([]);
+    // const [images, setImages] = useState<Image[]>([]);
     const [deletedImages, setDeletedImages] = useState<Image[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [selectedImage, setSelectedImage] = useState<Image | null>(null);
     const [message, setMessage] = useState<String>("");
+    const [successmessage, setSuccessMessage] = useState<String>("");
 	const [isloading, setIsLoading] = useState(false);
     const imagesPerPage: number = 8;
     const totalPages: number = Math.ceil(deletedImages.length / imagesPerPage);
+    const [restoringImageId, setRestoringImageId] = useState<string | null>(null);
+    const [pdeletingImageId, setPdeletingImageId] = useState<string | null>(null);
 
     useEffect(() => {
         setIsLoading(true)
@@ -34,27 +37,69 @@ function RecycleBin() {
                         setMessage("No deleted images found.");
                         setIsLoading(false);
                     }
+                    else {
+                        const fetchedImages: Image[] = response.data.map(
+							(photo: { photoId: string; imageName: string; presignedUrl:string }, index: number) => ({
+								id: photo.photoId,
+								src: photo.presignedUrl,
+								alt: `Image ${index + 1}`,
+							})
+						);
+						setDeletedImages(fetchedImages);
+                        setIsLoading(false);
+                    }
 				}
 			} catch (error) {
                 setIsLoading(false);
-                setMessage("There was an error while fetching the message")
 				console.log(error);
 			}
 		};
 		fetchImages();
-        // const mockDeletedImages: Image[] = Array.from({ length: 20 }, (_, i) => ({
-        //     id: i + 100,
-        //     src: `https://picsum.photos/300/200?random=${i + 100}`,
-        //     alt: `Deleted Image ${i + 1}`,
-        // }));
-        // setDeletedImages(mockDeletedImages);
     }, []);
 
-    const handleRestore = (image: Image): void => {
-        setDeletedImages(deletedImages.filter((img) => img.id !== image.id));
-        setImages([...images, image]);
-        if (selectedImage && selectedImage.id === image.id) {
-            setSelectedImage(null);
+    const handlePermanentDelete = async (image: Image): Promise<any> => {
+        setPdeletingImageId(image.id);
+        try {
+            const api_link = import.meta.env.VITE_API_URL;
+            const response = await axios.delete(`${api_link}/recycle-bin/${image.id}`, {headers: { Authorization: `Bearer ${sessionStorage.getItem('idToken')}`}});
+            if(response.status === 200) {
+                setSuccessMessage("Image permanently deleted successfully");
+                const newList = deletedImages.filter((e) => e.id !== image.id);
+                setDeletedImages(newList);
+            }
+            else {
+                setSuccessMessage(response.data.message || response.data.error);
+            }
+        } catch (error) {
+            if(error instanceof AxiosError) {
+                setSuccessMessage(error.response?.data.message || error.response?.data.error);
+            }
+        }
+        finally {
+            setPdeletingImageId(null);
+        }
+    }
+
+    const handleRestore = async (image: Image): Promise<any> => {
+        setRestoringImageId(image.id);
+        try {
+            const api_link = import.meta.env.VITE_API_URL;
+            const response = await axios.post(`${api_link}/recycle-bin/${image.id}/restore`, {}, {headers: { Authorization: `Bearer ${sessionStorage.getItem('idToken')}`}});
+            if(response.status === 200) {
+                setSuccessMessage("Image restored successfully");
+                const newList = deletedImages.filter((e) => e.id !== image.id);
+                setDeletedImages(newList);
+            }
+            else {
+                setSuccessMessage(response.data.message || response.data.error);
+            }
+        } catch (error) {
+            if(error instanceof AxiosError) {
+                setSuccessMessage(error.response?.data.message || error.response?.data.error);
+            }
+        }
+        finally {
+            setRestoringImageId(null);
         }
     };
 
@@ -72,6 +117,13 @@ function RecycleBin() {
     return (
         <Layout>
             <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Recycle Bin</h1>
+            {successmessage && (
+                <>
+                    <div className="h-48 w-full col-span-1 sm:col-span-2 lg:col-span-4 flex items-center justify-center">
+                        <p className="text-center font-semibold text-lg">{successmessage}</p>
+                    </div>
+                </>
+            )}
             {isloading ? (
                 <>
                     <div className="flex items-center justify-center h-48 w-full">
@@ -101,8 +153,11 @@ function RecycleBin() {
                                         image={image}
                                         onDelete={handleRestore}
                                         onSecondaryAction={handleRestore}
+                                        onPermanentlyDelete={handlePermanentDelete}
                                         onClick={setSelectedImage}
                                         isRecycleBin={true}
+                                        isRestoring={restoringImageId === image.id}
+                                        isPermanentlyDeleting={pdeletingImageId === image.id}
                                     />
                                 ))}
                             </div>

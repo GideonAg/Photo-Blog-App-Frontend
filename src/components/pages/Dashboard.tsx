@@ -20,7 +20,9 @@ function Dashboard() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [link, setLink] = useState("");
 	const [sharingImageId, setSharingImageId] = useState<string | null>(null);
+	const [deletingImageId, setDeletingImageId] = useState<string | null>(null);
 	const [buttonText,setButtonText] = useState("Copy Link");
+
 	
 	const imagesPerPage: number = 8;
 	const totalPages: number = Math.ceil(images.length / imagesPerPage);
@@ -59,18 +61,24 @@ function Dashboard() {
 	}, []);
 
 	const handleDelete = async (image: Image) => {
+		setDeletingImageId(image.id);
 		try {
 			const response = await axios.delete(`${api_link}/photos/${image.id}`, {
 				headers: { Authorization: `Bearer ${sessionStorage.getItem('idToken')}` },
 			});
 			if(response.data && response.status === 200) {
 				setMessage("Image moved to recycle bin");
+				const newList = images.filter((e) => e.id !== image.id);
+                setImages(newList);
 			}
 			setErrorMessage(response.data.message);
 		} catch (error) {
 			if (error instanceof AxiosError) {
 				setErrorMessage(error.response?.data.message || "Failed to delete");
 			}
+		}
+		finally {
+			setDeletingImageId(null);
 		}
 	};
 
@@ -161,6 +169,7 @@ function Dashboard() {
 									onSecondaryAction={handleShare}
 									onClick={setSelectedImage}
 									isSharing={sharingImageId === image.id}
+									isDeleting={deletingImageId === image.id}
 								/>
 							))
 						) : (
