@@ -106,7 +106,7 @@ export default function Login() {
     
     return (
         <AuthLayout heading="Login">
-            <div className="">
+            <div className="flex flex-col gap-y-3">
                 <form onSubmit={handleSubmit} noValidate>
                     <Input
                         onChange={handleChange}
@@ -134,6 +134,9 @@ export default function Login() {
                         {isSubmitting ? "Submitting..." : "Submit"}
                     </Button>
                 </form>
+                <div className="flex">
+                    Don't have an aacount?  <a className="underline" href="/register"> Click here to register</a>
+                </div>
             </div>
         </AuthLayout>
   );
