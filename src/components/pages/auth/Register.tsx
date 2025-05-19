@@ -174,6 +174,9 @@ export default function Register() {
 					{isSubmitting ? "Submitting..." : "Submit"}
 				</Button>
 			</form>
+			<div className="flex">
+				Already have an aacount?  <a className="underline" href="/login"> Click here to login</a>
+			</div>
 		</AuthLayout>
 	);
 }
