@@ -135,7 +135,7 @@ export default function Login() {
                     </Button>
                 </form>
                 <div className="flex">
-                    Don't have an aacount?  <a className="underline" href="/register"> Click here to register</a>
+                    Don't have an account?  <a className="underline" href="/register"> Click here to register</a>
                 </div>
             </div>
         </AuthLayout>
