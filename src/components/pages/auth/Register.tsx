@@ -175,7 +175,7 @@ export default function Register() {
 				</Button>
 			</form>
 			<div className="flex">
-				Already have an aacount?  <a className="underline" href="/login"> Click here to login</a>
+				Already have an account?  <a className="underline" href="/login"> Click here to login</a>
 			</div>
 		</AuthLayout>
 	);
