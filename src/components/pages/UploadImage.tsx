@@ -17,18 +17,18 @@ function UploadImage() {
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const file = event.target.files?.[0];
-        if (file && file.type.startsWith('image/')) {
+        if (file && file.type.startsWith('image/') && file.type !== 'image/webp') {
             setSelectedFile(file);
             const reader = new FileReader();
             reader.onload = () => {
                 setPreview(reader.result as string);
             };
             reader.readAsDataURL(file);
-        }
-        else {
-            setMessage("You can only upload an image");
+        } else {
+            setMessage("You can only upload an image (excluding .webp files)");
         }
     };
+
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>): void => {
         event.preventDefault();
